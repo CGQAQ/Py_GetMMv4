@@ -97,8 +97,9 @@ class Crawler:
             imgurlstrs = imgurlstr.split("<br />")
             imgurls = []
             try:
-                for imgurlstring in imgurlstrs:
-                    imgurls.append(imgurlstring.split("src")[1].split("\"")[1])
+                # for imgurlstring in imgurlstrs:
+                #     imgurls.append(imgurlstring.split("src")[1].split("\"")[1])
+                imgurls = [i.split("src")[1].split("\"")[1] for i in imgurlstrs]
             except:
                 pass
             try:
