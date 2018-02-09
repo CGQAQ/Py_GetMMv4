@@ -8,27 +8,31 @@ import re
 import os
 import shutil
 
-girlscates = ['http://www.meizitu.com/a/xinggan.html',
-              'http://www.meizitu.com/a/sifang.html',
-              'http://www.meizitu.com/a/qingchun.html',
-              'http://www.meizitu.com/a/meizi.html',
-              'http://www.meizitu.com/a/xiaoqingxin.htm', #end with .htm
-              'http://www.meizitu.com/a/nvshen.html',
-              'http://www.meizitu.com/a/qizhi.html',
-              'http://www.meizitu.com/a/mote.html',
-              'http://www.meizitu.com/a/bijini.html',
-              'http://www.meizitu.com/a/baobei.html',
-              'http://www.meizitu.com/a/luoli.html',
-              'http://www.meizitu.com/a/wangluo.html',
-              'http://www.meizitu.com/a/rihan.html',
-              'http://www.meizitu.com/a/oumei.html']
-catestring = ['性感','浴室','私房','美腿','清纯','甜美','治愈系','萌妹子','小清新','女神','气质美女',
-              '嫩模','车模','比基尼','足球','萝莉','90后','日韩','欧美']
+girlscates = [
+    'http://www.meizitu.com/a/pure.html',
+    'http://www.meizitu.com/a/cute.html',
+    'http://www.meizitu.com/a/sexy.html',
+    'http://www.meizitu.com/a/fuli.html',
+    'http://www.meizitu.com/a/legs.html',
+    'http://www.meizitu.com/a/rixi.html',
+    'http://www.meizitu.com/a/yundong.html',
+    'http://www.meizitu.com/tag/mote_6_1.html',
+    'http://www.meizitu.com/tag/keai_64_1.html',
+    'http://www.meizitu.com/tag/qizhi_53_1.html',
+    'http://www.meizitu.com/tag/banluo_5_1.html',
+    'http://www.meizitu.com/tag/nvshen_460_1.html',
+    'http://www.meizitu.com/tag/quanluo_4_1.html',
+    'http://www.meizitu.com/tag/chengshu_487_1.html'
+]
+catestring = ['颜值控', '萌妹', '性感', '福利', '美腿', '日系', '运动', '模特', '可爱', '气质', '半身棵体',
+              '女神', '全身棵体', '成熟']
+
 
 class Crawler:
     cate = ''
     count = 0
     number = 0
+
     @classmethod
     def openurl(cls, url):
         """
@@ -47,7 +51,7 @@ class Crawler:
         :param index: number of girls category
         :return: none
         """
-        html = cls.openurl(girlscates[index-1])
+        html = cls.openurl(girlscates[index - 1])
         while 1:
             nextpageurl = cls.getsubpage(html)
             if nextpageurl == '':
@@ -70,7 +74,6 @@ class Crawler:
 
         details = re.findall('(?<=class="tit"><a href=").*?(?=")', html, re.M)
 
-
         cls.fetchimg(details)
         return nextpageurl
 
@@ -92,14 +95,14 @@ class Crawler:
             os.mkdir("./MM/" + cls.cate)
         for url in details:
             html = cls.openurl(url)
-            #print(html)
+            # print(html)
             imgurlstr = re.search('(?<="picture">)(.|\n)*?(?=</div>)', html, re.M).group()
             imgurlstrs = imgurlstr.split("<br />")
             imgurls = []
             try:
-                # for imgurlstring in imgurlstrs:
-                #     imgurls.append(imgurlstring.split("src")[1].split("\"")[1])
-                imgurls = [i.split("src")[1].split("\"")[1] for i in imgurlstrs]
+                for imgurlstring in imgurlstrs:
+                    imgurls.append(imgurlstring.split("src")[1].split("\"")[1])
+                # imgurls = [i.split("src")[1].split("\"")[1] for i in imgurlstrs]  不能用！ 因为最后一个元素会导致indexoutofbound导致列表推导式生成空数组
             except:
                 pass
             try:
@@ -110,8 +113,8 @@ class Crawler:
                     with open("./MM/" + cls.cate + '/' + imgurl.split('uploads/')[-1].replace('/', '_'), 'wb') as f:
                         f.write(res.read())
                     cls.number += 1
-                    print("\n"*20)
-                    print("爬取中。。。" + '已爬取：'+str(cls.number)+'/'+'共计：'+str(cls.count))
+                    print("\n" * 20)
+                    print("爬取中。。。" + '已爬取：' + str(cls.number) + '/' + '共计：' + str(cls.count))
                     if cls.count <= cls.number:
                         print("爬取完成")
                         os._exit(0)
@@ -122,58 +125,16 @@ class Crawler:
 
     @classmethod
     def run(cls):
-        str = ''
-        while(not str.isnumeric() or not 0<int(str)<20 or not 0 < cls.count):
-            str = input('请选择爬取的图片类型（输入数字编号）：\n'
-                        '1.性感\n'
-                        '2.浴室\n'
-                        '3.私房\n'
-                        '4.美腿\n'
-                        '5.清纯\n'
-                        '6.甜美\n'
-                        '7.治愈系\n'
-                        '8.萌妹子\n'
-                        '9.小清新\n'
-                        '10.女神\n'
-                        '11.气质美女\n'
-                        '12.嫩模\n'
-                        '13.车模\n'
-                        '14.比基尼\n'
-                        '15.足球宝贝\n'
-                        '16.萝莉\n'
-                        '17.90后\n'
-                        '18.日韩\n'
-                        '19.欧美\n')
+        str1 = ''
+        info = '请选择爬取的图片类型（输入数字编号）：\n'
+        for a in range(len(catestring)):
+            info = info + str(a+1) + '.' + catestring[a] + '\n'
+        while (not str1.isnumeric() or not 0 < int(str1) < 15 or not 0 < cls.count):
+            str1 = input(info)
             cls.count = int(input("想要几张？\n"))
-        cls.cate = catestring[int(str)-1]
-        if str=='1' or str=='2':
-            cls.getmainpage(1)
-        elif str=='3' or str=='4':
-            cls.getmainpage(2)
-        elif str=='5' or str=='6' or str=='7':
-            cls.getmainpage(3)
-        elif str =='8':
-            cls.getmainpage(4)
-        elif str=='9':
-            cls.getmainpage(5)
-        elif str=='10':
-            cls.getmainpage(6)
-        elif str=='11':
-            cls.getmainpage(7)
-        elif str=='12' or str=='13':
-            cls.getmainpage(8)
-        elif str=='14':
-            cls.getmainpage(9)
-        elif str=='15':
-            cls.getmainpage(10)
-        elif str=='16':
-            cls.getmainpage(11)
-        elif str=='17':
-            cls.getmainpage(12)
-        elif str=='18':
-            cls.getmainpage(13)
-        elif str=='19':
-            cls.getmainpage(14)
+        cls.cate = catestring[int(str1) - 1]
+        cls.getmainpage(int(str1))
+
 
 c = Crawler()
 c.run()
